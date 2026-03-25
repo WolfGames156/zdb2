@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="https://zoream.pages.dev/zoreamlogo.png" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zoream Server</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+
+
+    <!-- Main Server Section -->
+    <div style="display: flex; flex-direction: column; align-items: center; margin-top: 3rem;">
+      <h1 style="color: #fff; font-size: 1.5rem; margin-bottom: 1rem;">Zoream Database Server</h1>
+      <span id="server-status" class="badge success">Checking...</span>
+    </div>
+    <script>
+      // Fetch and display server status from GitHub status.txt
+      async function updateServerStatus() {
+        try {
+          const response = await fetch('https://raw.githubusercontent.com/WolfGames156/Zoream-Database/refs/heads/main/zoream_status.txt');
+          const status = (await response.text()).trim().toLowerCase();
+
+          const statusBadge = document.getElementById('server-status');
+
+          if (status === 'up') {
+            statusBadge.textContent = 'Online';
+            statusBadge.className = 'badge success';
+          } else if (status === 'down') {
+            statusBadge.textContent = 'Offline';
+            statusBadge.className = 'badge danger';
+          } else if (status === 'care') {
+            statusBadge.textContent = 'Maintenance';
+            statusBadge.className = 'badge warning';
+          } else {
+            statusBadge.textContent = 'Unknown';
+            statusBadge.className = 'badge warning';
+          }
+        } catch (error) {
+          console.error('Failed to fetch server status:', error);
+          const statusBadge = document.getElementById('server-status');
+          statusBadge.textContent = 'Error';
+          statusBadge.className = 'badge danger';
+        }
+      }
+
+      // Update status on page load
+      updateServerStatus();
+
+    </script>
+</body>
+
+</html>

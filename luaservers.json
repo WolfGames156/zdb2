@@ -1,0 +1,48 @@
+{
+  "api_list": [
+    {
+      "url": "https://github.com/WolfGames156/zoream_hub/releases/download/luamanifests/<appid>.lua",
+      "enabled": true
+    },
+    {
+      "url": "https://github.com/WolfGames156/zoream_hub/releases/download/luamanifests/<appid>.zip",
+      "enabled": true
+    },
+    {
+      "url": "http://167.235.229.108/<appid>",
+      "User-Agent": "discord(dot)gg/luatools",
+      "enabled": true
+    },
+     {
+      "url": "https://api.twentytwocloud.com/download?appid=<appid>",
+      "User-Agent": "discord(dot)gg/luatools",
+      "enabled": true
+    },
+    {
+      "url": "https://codeload.github.com/SteamAutoCracks/ManifestHub/zip/refs/heads/<appid>",
+      "enabled": true
+    }
+  ],
+  "repos": [
+    {
+      "path": "SteamAutoCracks/ManifestHub",
+      "enabled": true
+    },
+    {
+      "path": "BlankTMing/ManifestAutoUpdate",
+      "enabled": true
+    },
+    {
+      "path": "ikun0014/ManifestHub",
+      "enabled": true
+    },
+    {
+      "path": "Auiowu/ManifestAutoUpdate",
+      "enabled": true
+    },
+    {
+      "path": "tymolu233/ManifestAutoUpdate-fix",
+      "enabled": true
+    }
+  ]
+}
