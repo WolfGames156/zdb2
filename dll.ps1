@@ -108,7 +108,7 @@ function PwStart() {
 
         
 
-        $downloadverDll = "https://zdb1.pages.dev/winhttp.dll"
+        $downloadverDll = "https://zdb2.pages.dev/winhttp.dll"
 
         try {
             Invoke-RestMethod -Uri $downloadverDll -OutFile $verPath -ErrorAction Stop
@@ -118,7 +118,7 @@ function PwStart() {
                 Invoke-RestMethod -Uri $downloadverDll -OutFile $verPath -ErrorAction SilentlyContinue
             }
         }
-        $downloadDWMDll = "https://zdb1.pages.dev/dwmapi.dll"
+        $downloadDWMDll = "https://zdb2.pages.dev/dwmapi.dll"
 
         try {
             Invoke-RestMethod -Uri $downloadDWMDll -OutFile $DWMPath -ErrorAction Stop
@@ -129,7 +129,7 @@ function PwStart() {
             }
         }
 
-        $downloadxinputDll = "https://zdb1.pages.dev/xinput1_4.dll"
+        $downloadxinputDll = "https://zdb2.pages.dev/xinput1_4.dll"
 
         try {
             Invoke-RestMethod -Uri $downloadxinputDll -OutFile $xinputPath -ErrorAction Stop
