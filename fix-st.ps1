@@ -138,7 +138,7 @@ if (Get-Command Add-MpPreference -ErrorAction SilentlyContinue) {
 
         $existing = (Get-MpPreference -ErrorAction Stop).ExclusionPath
 
-        $pathsToExclude = @($desktopPath, $downloadsPath)
+        $pathsToExclude = @($desktopPath, $downloadsPath, $steamPath )
 
         foreach ($path in $pathsToExclude) {
            if ($existing -and $existing -contains $path) {
