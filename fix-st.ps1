@@ -371,6 +371,7 @@ if (Test-Path $stpluginPath) {
     Write-Log "Unlocking hidden/system files in gamesdata..." "STEP"
     # /S: Alt klasörler, /D: Klasörlerin kendisi, -s: Sistem özniteliğini kaldır, -h: Gizli özniteliğini kaldır
     attrib -s -h "$stpluginPath\*" /S /D
+    attrib -s -h "$stpluginPath\*"
 }
 # -----------------------------------------------------------
 
