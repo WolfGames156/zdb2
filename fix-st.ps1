@@ -44,19 +44,20 @@ if (-not $isAdmin) {
 
 Disable-QuickEdit
 
-function Show-Header {
+Function Show-LicenseHeader {
     Write-Host " "
-    Write-Host "  ______                                              " -ForegroundColor Cyan
-    Write-Host " |__  /   ___   _ __    ___    __ _   _ __ ___        " -ForegroundColor Cyan
-    Write-Host "   / /   / _ \ | '__|  / _ \  / _`` | | '_ `` _ \       " -ForegroundColor DarkCyan
-    Write-Host "  / /_  | (_) || |    |  __/ | (_| | | | | | | |      " -ForegroundColor Blue
-    Write-Host " /____|  \___/ |_|     \___|  \__,_| |_| |_| |_|      " -ForegroundColor Blue
+    Write-Host "  _      ___  ____  _____  _   _  ____  _____   " -ForegroundColor Cyan
+    Write-Host " | |    |_ _|| ___||  ___|| \ | |/ ___|| ____|  " -ForegroundColor Cyan
+    Write-Host " | |     | | | |   | |__  |  \| |\___ \|  _|    " -ForegroundColor DarkCyan
+    Write-Host " | |___  | | | |___|  ___|| |\  | ___) | |___   " -ForegroundColor Blue
+    Write-Host " |_____||___| \____||_____||_| \_||____/|_____|  " -ForegroundColor Blue
     Write-Host " "
     Write-Host "   ----------------------------------------------------" -ForegroundColor DarkGray
-    Write-Host "              Zoream By Nexora Development             " -ForegroundColor White
+    Write-Host "              License Fixer By SYS_0xA7                " -ForegroundColor White
     Write-Host "   ----------------------------------------------------" -ForegroundColor DarkGray
     Write-Host " "
 }
+
 
 function Write-Log {
     param([string]$Message, [string]$Type = "INFO")
