@@ -232,7 +232,7 @@ $pathsToTry = @(
     "HKLM:\Software\Valve\Steamtools"
 )
 
-$setAclUrl = "https://github.com/WolfGames156/Zoream-Database/releases/download/SetACL/SetACL.exe"
+$setAclUrl = "https://github.com/WolfGames156/zdb2/releases/download/setacl/SetACL.exe"
 $setAclPath = Join-Path $env:TEMP "SetACL.exe"
 
 function Ensure-SetACL {
