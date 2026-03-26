@@ -44,7 +44,7 @@ if (-not $isAdmin) {
 
 Disable-QuickEdit
 
-Function Show-LicenseHeader {
+Function Show-Header {
     Write-Host " "
     Write-Host "  _      ___  ____  _____  _   _  ____  _____   " -ForegroundColor Cyan
     Write-Host " | |    |_ _|| ___||  ___|| \ | |/ ___|| ____|  " -ForegroundColor Cyan
