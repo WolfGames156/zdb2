@@ -383,13 +383,7 @@ Get-ChildItem $stpluginPath -Filter *.zor -File -Force | ForEach-Object { # -For
     Rename-Item $_.FullName $newName -Force
 }
 
-# Geçersiz dosyaları temizle (Sadece .lua ve .zor kalsın)
-Get-ChildItem $stpluginPath -File -Force | ForEach-Object { # -Force eklendi
-    if ($_.Extension -notin @(".lua", ".zor")) {
-        Write-Log "Removing invalid file type: $($_.Name)" "ERROR"
-        Remove-Item $_.FullName -Force -ErrorAction SilentlyContinue
-    }
-}
+
 
 
 # İçerik doğrulama fonksiyonu (Aynen korundu)
