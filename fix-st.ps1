@@ -362,8 +362,7 @@ else {
 
 Write-Log "Validating and Cleaning gamesdata folder..." "STEP"
 
-# Yeni dosya yolu tanımı (%appdata%\Zoream\gamesdata)
-$zoreamAppData = Join-Path $env:APPDATA
+$zoreamAppData = $env:APPDATA
 $stpluginPath = Join-Path $zoreamAppData "gamesdata"
 
 # --- EKLENEN KISIM: Gizli ve Sistem dosyalarını görünür yap ---
