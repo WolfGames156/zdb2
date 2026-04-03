@@ -82,8 +82,6 @@ $hostsPath = "$env:SystemRoot\System32\drivers\etc\hosts"
 
 # Tutulacak (İzin verilen) girişler
 $allowedEntries = @(
-    "127.0.0.1 steam.run",
-    "::1 steam.run",
     "127.0.0.1 api.paradisedev.org",
     "127.0.0.1 api2.paradisedev.org",
     "::1 api.paradisedev.org",
