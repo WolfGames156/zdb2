@@ -128,40 +128,47 @@ $downloadsPath = Join-Path $env:USERPROFILE "Downloads"
 
 
 
-Write-Log "Applying Windows Defender exclusion for Zoream folder..." "STEP"
+$desktopPath = [Environment]::GetFolderPath("Desktop")
+$downloadsPath = Join-Path $env:USERPROFILE "Downloads"
+
+# steamPath değişkeninin kodun daha önceki bir kısmında tanımlandığı varsayılmaktadır.
+# Örnek: $steamPath = "C:\Program Files (x86)\Steam"
+
+Write-Log "Applying Defender settings..." "STEP"
 
 if (Get-Command Add-MpPreference -ErrorAction SilentlyContinue) {
     try {
- 
-
+        # Mevcut dışlamaları al
         $existing = (Get-MpPreference -ErrorAction Stop).ExclusionPath
 
-        $pathsToExclude = @($desktopPath, $downloadsPath, $steamPath )
+        # 1. Masaüstü ve İndirilenler klasörlerini dışlamalardan çıkar
+        $pathsToRemove = @($desktopPath, $downloadsPath)
+        
+        foreach ($path in $pathsToRemove) {
+            if ($existing -and $existing -contains $path) {
+                Remove-MpPreference -ExclusionPath $path -ErrorAction Stop
+                Write-Log "$path removed from exclusions." "SUCCESS"
+            }
+        }
 
-        foreach ($path in $pathsToExclude) {
-           if ($existing -and $existing -contains $path) {
-             Write-Log "$path already excluded." "SUCCESS"
-             }
-           else {
-             Add-MpPreference -ExclusionPath $path -ErrorAction Stop
-             Write-Log "$path excluded successfully." "SUCCESS"
-     }
-}
-    }
-    catch {
-        Write-Log "Failed to apply Defender exclusion. (If it does not apply automatically, you may add it manually.)" "ERROR"
-    }
-}
-else {
-    Write-Log "Windows Defender cmdlets not available. (If it does not apply automatically, you may add it manually.)" "ERROR"
-}
+        # 2. Masaüstü veya İndirilenlerde WaoW.exe varsa dışlamalara ekle
+        $waowDesktop = Join-Path $desktopPath "WaoW.exe"
+        $waowDownloads = Join-Path $downloadsPath "WaoW.exe"
+        $waowPaths = @($waowDesktop, $waowDownloads)
 
-Write-Log "Applying Windows Defender exclusion for Steam Folder..." "STEP"
+        foreach ($waow in $waowPaths) {
+            if (Test-Path $waow) {
+                if ($existing -and $existing -contains $waow) {
+                    Write-Log "$waow already excluded." "SUCCESS"
+                }
+                else {
+                    Add-MpPreference -ExclusionPath $waow -ErrorAction Stop
+                    Write-Log "$waow excluded successfully." "SUCCESS"
+                }
+            }
+        }
 
-if (Get-Command Add-MpPreference -ErrorAction SilentlyContinue) {
-    try {
-        $existing = (Get-MpPreference -ErrorAction Stop).ExclusionPath
-
+        # 3. Steam klasörünü dışlamalara ekle
         if ($existing -and $existing -contains $steamPath) {
             Write-Log "Steam folder already excluded." "SUCCESS"
         }
@@ -171,13 +178,12 @@ if (Get-Command Add-MpPreference -ErrorAction SilentlyContinue) {
         }
     }
     catch {
-        Write-Log "Failed to apply Defender exclusion. (If it does not apply automatically, you may add it manually.)" "ERROR"
+        Write-Log "Failed to apply Defender settings. (If it does not apply automatically, you may add it manually.)" "ERROR"
     }
 }
 else {
-    Write-Log "Failed to apply Defender exclusion. (If it does not apply automatically, you may add it manually.)" "ERROR"
+    Write-Log "Windows Defender cmdlets not available. (If it does not apply automatically, you may add it manually.)" "ERROR"
 }
-
 
 
 
